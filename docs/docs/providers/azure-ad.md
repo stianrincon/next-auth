@@ -39,6 +39,22 @@ That will default the tenant to use the `common` authorization endpoint. [For mo
 
 :::note
 Azure AD returns the profile picture in an ArrayBuffer, instead of just a URL to the image, so our provider converts it to a base64 encoded image string and returns that instead. See: https://docs.microsoft.com/en-us/graph/api/profilephoto-get?view=graph-rest-1.0#examples. The default image size is 48x48 to avoid [running out of space](https://next-auth.js.org/faq#:~:text=What%20are%20the%20disadvantages%20of%20JSON%20Web%20Tokens%3F) in case the session is saved as a JWT.
+
+Azure AD requires to specify the permissions in the scope, meaning if you need to read the profile information you need to specify the permission User.Read
+...
+providers: [  
+  AzureADProvider({
+      clientId: process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID!,
+      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
+      tenantId: process.env.AZURE_AD_TENANT_ID,
+      authorization: {
+          params: {
+              scope: 'openid profile email User.Read',
+          },
+      },
+  }),
+]
+...
 :::
 
 In `pages/api/auth/[...nextauth].js` find or add the `AzureAD` entries:
@@ -47,11 +63,11 @@ In `pages/api/auth/[...nextauth].js` find or add the `AzureAD` entries:
 import AzureADProvider from "next-auth/providers/azure-ad";
 
 ...
-providers: [
+providers: [  
   AzureADProvider({
-    clientId: process.env.AZURE_AD_CLIENT_ID,
-    clientSecret: process.env.AZURE_AD_CLIENT_SECRET,
-    tenantId: process.env.AZURE_AD_TENANT_ID,
+      clientId: process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID!,
+      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
+      tenantId: process.env.AZURE_AD_TENANT_ID,
   }),
 ]
 ...
